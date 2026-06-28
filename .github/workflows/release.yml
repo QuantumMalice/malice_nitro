@@ -1,0 +1,96 @@
+name: Create New Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New Version"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Get Latest Tag
+        id: get_tag
+        run: |
+          RAW_TAG="${{ github.event.inputs.version }}"
+
+          echo "clean_version=${RAW_TAG#v}" >> $GITHUB_ENV
+          echo "tag_version=$RAW_TAG" >> $GITHUB_ENV
+          echo "LATEST_TAG=$(git tag --sort=-creatordate | head -n 1)" >> $GITHUB_ENV
+
+      - name: Existing Release Check
+        run: |
+          if gh release view "${{ env.tag_version }}" &>/dev/null; then
+            echo -e "\033[31mRelease ${{ env.tag_version }} already exists. Exiting.\033[0m"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Push manifest change
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: fxmanifest.lua
+          push: true
+          message: "chore: bump manifest version to ${{ env.clean_version }}"
+          tag: ${{ env.clean_version }}
+
+      - name: Create Tag
+        run: |
+          git tag ${{ env.tag_version }}
+          git push origin ${{ env.tag_version }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Bundle Files
+        run: |
+          REPO=${{ github.event.repository.name }}
+          ZIP_NAME="${REPO}.zip"
+          mkdir $REPO
+          cp {README.md,LICENSE,fxmanifest.lua,client.lua,server.lua} $REPO/
+          cp -r class data locales images $REPO/
+          zip -r $ZIP_NAME $REPO
+          rm -rf $REPO
+
+      - name: Update CHANGELOG
+        if: env.LATEST_TAG != ''
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fromTag: ${{ env.tag_version }}
+          toTag: ${{ env.LATEST_TAG }}
+          includeInvalidCommits: true
+          writeToFile: false
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          name: ${{ env.tag_version }}
+          tag: ${{ env.tag_version }}
+          body: ${{ steps.changelog.outputs.changes }}
+          artifacts: ${{ github.event.repository.name }}.zip
+          token: ${{ secrets.GITHUB_TOKEN }}

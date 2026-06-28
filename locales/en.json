@@ -1,0 +1,15 @@
+{
+  "target": {
+    "refill": "Refill nitrous oxide"
+  },
+  "progress": {
+    "install": "Installing nitrous"
+  },
+  "notify": {
+    "title": "Nitrous Oxide",
+    "notValid": "This vehicle cannot be loaded with nitrous",
+    "noTurbo": "This vehicle does not have a turbo installed",
+    "isLoaded": "This vehicle is already loaded with nitrous",
+    "noFunds": "Insufficient funds"
+  }
+}
