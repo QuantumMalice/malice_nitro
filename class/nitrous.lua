@@ -29,7 +29,7 @@ local BONES <const> = {
 ---@class Nitrous : OxClass
 ---@field private private privateNitrousData
 ---@diagnostic disable-next-line: assign-type-mismatch
-local Nitrous = lib.class('vix_nitro')
+local Nitrous = lib.class('malice_nitro')
 
 function Nitrous:constructor()
     self.private.active = false
@@ -64,7 +64,7 @@ function Nitrous:setExhaustBone()
 end
 
 function Nitrous:start()
-    lib.callback('vix_nitrous:server:sync', false, function()
+    lib.callback('malice_nitrous:server:sync', false, function()
         lib.requestNamedPtfxAsset(Settings.particle.dict)
         SetPtfxAssetNextCall(Settings.particle.dict)
         UseParticleFxAssetNextCall(Settings.particle.dict)
@@ -95,7 +95,7 @@ end
 
 ---@param item boolean
 function Nitrous:stop(item)
-    lib.callback('vix_nitrous:server:sync', false, function()
+    lib.callback('malice_nitrous:server:sync', false, function()
         ---@diagnostic disable-next-line: param-type-mismatch
         StopParticleFxLooped(particle, true)
         RemoveNamedPtfxAsset(Settings.particle.dict)
@@ -107,7 +107,7 @@ function Nitrous:stop(item)
     SetVehicleEngineTorqueMultiplier(cache.vehicle, 0.0)
 
     if item and Settings.giveEmpty then
-        TriggerServerEvent('vix_nitrous:server:unload', VehToNet(cache.vehicle))
+        TriggerServerEvent('malice_nitrous:server:unload', VehToNet(cache.vehicle))
     end
 
     self.private.active = false

@@ -31,7 +31,7 @@ end
 
 exports('nitrous', function(event, item, inventory)
     if event == 'usingItem' then
-        local success, netid = lib.callback.await('vix_nitrous:client:load', inventory.id)
+        local success, netid = lib.callback.await('malice_nitrous:client:load', inventory.id)
 
         if success then
             if Settings.giveEmpty then
@@ -48,7 +48,7 @@ end)
 
 if Settings.giveEmpty then
     ---@param netid integer
-    RegisterNetEvent('vix_nitrous:server:unload', function(netid)
+    RegisterNetEvent('malice_nitrous:server:unload', function(netid)
         local src = source
         local vehicle = NetworkGetEntityFromNetworkId(netid)
 
@@ -60,7 +60,7 @@ if Settings.giveEmpty then
 end
 
 if Settings.useRefill then
-    RegisterNetEvent('vix_nitro:server:refill', function()
+    RegisterNetEvent('malice_nitro:server:refill', function()
         local src = source
         local count = Inventory:Search(src, 'count', 'emptynitrous')
 
@@ -77,6 +77,6 @@ if Settings.useRefill then
     end)
 end
 
-lib.callback.register('vix_nitrous:server:sync', function()
+lib.callback.register('malice_nitrous:server:sync', function()
     return true
 end)

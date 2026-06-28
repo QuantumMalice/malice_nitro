@@ -10,7 +10,7 @@ local Notify <const> = lib.load('data.notify')
 
 local Nitrous = nil
 
-lib.callback.register('vix_nitrous:client:load', function()
+lib.callback.register('malice_nitrous:client:load', function()
     if not Nitrous then return false end
     if not cache.vehicle or cache.seat ~= -1 then return false end
     if Inventory:Search('count', 'nitrous') < 1 then return false end
@@ -115,7 +115,7 @@ CreateThread(function()
                         iconColor = 'lightblue',
                         label = locale('target.refill'),
                         distance = 2,
-                        serverEvent = 'vix_nitro:server:refill',
+                        serverEvent = 'malice_nitro:server:refill',
                         canInteract = function()
                             return Inventory:Search('count', 'emptynitrous') >= 1
                         end
