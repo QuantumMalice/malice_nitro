@@ -22,5 +22,11 @@ return {
         description = locale('notify.noFunds'),
         position = 'top',
         type = 'error'
+    },
+    ['no_space'] = {
+        title = locale('notify.title'),
+        description = locale('notify.noSpace'),
+        position = 'top',
+        type = 'error'
     }
 }

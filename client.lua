@@ -10,6 +10,24 @@ local Notify <const> = lib.load('data.notify')
 
 local Nitrous = nil
 
+local function addRadialItem()
+    lib.addRadialItem({
+        {
+            id = 'unload_nitrous',
+            label = 'Unload Nitrous',
+            icon = 'hand-holding-droplet',
+            onSelect = function()
+                --TODO: Add a progress bar for unloading nitrous
+                local success = lib.callback.await('malice_nitrous:server:unload', false,  VehToNet(cache.vehicle))
+
+                if success then
+                    lib.removeRadialItem('unload_nitrous')
+                end
+            end
+        }
+    })
+end
+
 lib.callback.register('malice_nitrous:client:load', function()
     if not Nitrous then return false end
     if not cache.vehicle or cache.seat ~= -1 then return false end
@@ -18,46 +36,18 @@ lib.callback.register('malice_nitrous:client:load', function()
     if Settings.needTurbo and not IsToggleModOn(cache.vehicle, 18) then lib.notify(Notify['no_turbo']) return false end
 
     local nitro = Entity(cache.vehicle).state.nitrous
-    if nitro and nitro > 0.0 then lib.notify(Notify['is_loaded']) return true end
+    if nitro and nitro > 0.0 then lib.notify(Notify['is_loaded']) return false end
 
     if lib.progressCircle(Progress['install']) then
         ClearPedTasks(cache.ped)
-        Entity(cache.vehicle).state:set('nitrous', 100.0, true)
+        Nitrous.keybind:disable(false)
+        addRadialItem()
 
         return true, VehToNet(cache.vehicle)
     else
         return false
     end
 end)
-
-local keybind = lib.addKeybind({
-    name = 'nitrous',
-    description = 'press left shift to activate nitrous',
-    defaultKey = 'LSHIFT',
-    onPressed = function()
-        if not Nitrous then return end
-        if Nitrous:isActive() then return end
-        if not Nitrous:isVehicleValid() then return end
-        if not GetIsVehicleEngineRunning(cache.vehicle) then return end
-
-        local nitro = Entity(cache.vehicle).state.nitrous
-
-        if nitro and nitro > 0.0 then
-            Nitrous:start()
-        end
-    end,
-    onReleased = function()
-        if not Nitrous then return end
-        if not Nitrous:isActive() then return end
-        if not Nitrous:isVehicleValid() then return end
-
-        local nitro = Entity(cache.vehicle).state.nitrous
-
-        if nitro and nitro > 0.0 then
-            Nitrous:stop(false)
-        end
-    end
-})
 
 ---@param seat number
 lib.onCache('seat', function(seat)
@@ -66,15 +56,22 @@ lib.onCache('seat', function(seat)
     if Nitrous:getExhaustBone() ~= nil then
         Nitrous:setExhaustBone()
 
-        if seat == -1 then
-            if Nitrous:isVehicleValid() then
-                keybind:disable(false)
+        if seat == -1 and Nitrous:isVehicleValid() then
+            local nitro = Entity(cache.vehicle).state.nitrous
+
+            if nitro and nitro > 0.0 then
+                addRadialItem()
+                Nitrous.keybind:disable(false)
             end
         else
             if Nitrous:isActive() then
                 Nitrous:stop(false)
             end
-            keybind:disable(true)
+
+            if not Nitrous.keybind.disabled then
+                lib.removeRadialItem('unload_nitrous')
+                Nitrous.keybind:disable(true)
+            end
         end
     end
 end)
@@ -82,14 +79,13 @@ end)
 CreateThread(function()
     Nitrous = Class:new()
 
-    if cache.seat == -1 then
-        if Nitrous:isVehicleValid() then
-            keybind:disable(false)
-        else
-            keybind:disable(true)
+    if cache.seat == -1 and Nitrous:isVehicleValid() then
+        local nitro = Entity(cache.vehicle).state.nitrous
+
+        if nitro and nitro > 0.0 then
+            addRadialItem()
+            Nitrous.keybind:disable(false)
         end
-    else
-        keybind:disable(true)
     end
 
     if Settings.useRefill then
@@ -117,7 +113,7 @@ CreateThread(function()
                         distance = 2,
                         serverEvent = 'malice_nitro:server:refill',
                         canInteract = function()
-                            return Inventory:Search('count', 'emptynitrous') >= 1
+                            return Inventory:Search('count', 'nitrous', { durability = 0 }) >= 1
                         end
                     })
                 end,

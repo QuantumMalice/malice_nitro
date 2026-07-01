@@ -27,6 +27,7 @@ local BONES <const> = {
 ---@field exhaust string|false
 
 ---@class Nitrous : OxClass
+---@field keybind CKeybind
 ---@field private private privateNitrousData
 ---@diagnostic disable-next-line: assign-type-mismatch
 local Nitrous = lib.class('malice_nitro')
@@ -34,6 +35,34 @@ local Nitrous = lib.class('malice_nitro')
 function Nitrous:constructor()
     self.private.active = false
     self:setExhaustBone()
+
+    self.keybind = lib.addKeybind({
+        name = 'nitrous',
+        description = 'press left shift to activate nitrous',
+        defaultKey = 'LSHIFT',
+        disabled = true,
+        onPressed = function()
+            if self:isActive() then return end
+            if not self:isVehicleValid() then return end
+            if not GetIsVehicleEngineRunning(cache.vehicle) then return end
+
+            local nitro = Entity(cache.vehicle).state.nitrous
+
+            if nitro and nitro > 0.0 then
+                self:start()
+            end
+        end,
+        onReleased = function()
+            if not self:isActive() then return end
+            if not self:isVehicleValid() then return end
+
+            local nitro = Entity(cache.vehicle).state.nitrous
+
+            if nitro and nitro > 0.0 then
+                self:stop(false)
+            end
+        end
+    })
 end
 
 ---@return boolean active
@@ -64,6 +93,10 @@ function Nitrous:setExhaustBone()
 end
 
 function Nitrous:start()
+    if self.private.active then return end
+
+    self.private.active = true
+
     lib.callback('malice_nitrous:server:sync', false, function()
         lib.requestNamedPtfxAsset(Settings.particle.dict)
         SetPtfxAssetNextCall(Settings.particle.dict)
@@ -76,8 +109,6 @@ function Nitrous:start()
     SetVehicleEnginePowerMultiplier(cache.vehicle, Settings.multiplier.enginePower)
     SetVehicleEngineTorqueMultiplier(cache.vehicle, Settings.multiplier.engineTorque)
 
-    self.private.active = true
-
     CreateThread(function()
         while self:isActive() do
             local nitro = Entity(cache.vehicle).state.nitrous
@@ -86,6 +117,7 @@ function Nitrous:start()
                 Entity(cache.vehicle).state:set('nitrous', nitro - Settings.depletionRate, true)
             else
                 self:stop(true)
+                self.keybind:disable(true)
             end
 
             Wait(Settings.depletionTick)
@@ -95,6 +127,10 @@ end
 
 ---@param item boolean
 function Nitrous:stop(item)
+    if not self.private.active then return end
+
+    self.private.active = false
+
     lib.callback('malice_nitrous:server:sync', false, function()
         ---@diagnostic disable-next-line: param-type-mismatch
         StopParticleFxLooped(particle, true)
@@ -107,10 +143,8 @@ function Nitrous:stop(item)
     SetVehicleEngineTorqueMultiplier(cache.vehicle, 0.0)
 
     if item and Settings.giveEmpty then
-        TriggerServerEvent('malice_nitrous:server:unload', VehToNet(cache.vehicle))
+        TriggerServerEvent('malice_nitrous:server:giveEmpty', VehToNet(cache.vehicle))
     end
-
-    self.private.active = false
 end
 
 return Nitrous

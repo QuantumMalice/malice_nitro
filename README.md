@@ -1,20 +1,17 @@
-# malice_nitro
+![Main Banner](https://i.imgur.com/qyeKUDy.png)
 
 Lightweight NOS system built around statebags for tracking levels. Simple, clean, and designed to be easy to integrate into existing ox-based setups.
 
-## **Current Features:**
+## **Features:**
 
-➢ Smooth nitrous system <br>
-➢ Synced particle effects <br>
-➢ Configurable refill stations <br>
-➢ Restart-safe (keeps statebag data intact) <br>
-➢ Easy configuration and integration <br>
-
-## **Planned Features:**
-
+- [x] Restart-safe <br>
+- [x] Smooth nitrous system <br>
+- [x] Bottle removal (radial menu) <br>
+- [x] Configurable refill stations <br>
+- [x] Easy configuration and integration <br>
+- [ ] Synced particle effects <br>
 - [ ] Purge mode <br>
 - [ ] Persistence abstraction <br>
-- [ ] Bottle removal (recover partially full bottles) <br>
 - [ ] Configurable boost curves <br>
 - [ ] Bottle pressure simulation <br>
 
@@ -24,9 +21,8 @@ Lightweight NOS system built around statebags for tracking levels. Simple, clean
 - [ox_target](https://github.com/overextended/ox_target)
 - [ox_inventory](https://github.com/overextended/ox_inventory)
 
-### Access Nitrous Level (for HUDs)
-
 ```lua
+-- Access nitrous level (for HUDs)
 Entity(cache.vehicle).state.nitrous
 ```
 
@@ -38,7 +34,7 @@ Entity(cache.vehicle).state.nitrous
         weight = 1000,
         stack = true,
         close = true,
-        description = "Full bottle of nitrous oxide",
+        description = "Bottle of nitrous oxide",
         client = {
             image = "nitrous.png",
         },
@@ -46,15 +42,4 @@ Entity(cache.vehicle).state.nitrous
             export = 'malice_nitro.nitrous'
         }
     },
-
-	["emptynitrous"] = {
-		label = "Empty Nitrous",
-		weight = 100,
-		stack = true,
-		close = true,
-		description = "Depleted bottle of nitrous oxide",
-		client = {
-			image = "nitrous.png",
-		}
-	},
 ```
