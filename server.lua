@@ -60,10 +60,6 @@ exports('nitrous', function(event, item, inventory, slot, data)
     end
 end)
 
-lib.callback.register('malice_nitrous:server:sync', function()
-    return true
-end)
-
 ---@param netid integer
 RegisterNetEvent('malice_nitrous:server:unload', function(netid)
     local src = source

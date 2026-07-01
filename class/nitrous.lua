@@ -97,13 +97,11 @@ function Nitrous:start()
 
     self.private.active = true
 
-    lib.callback('malice_nitrous:server:sync', false, function()
-        lib.requestNamedPtfxAsset(Settings.particle.dict)
-        SetPtfxAssetNextCall(Settings.particle.dict)
-        UseParticleFxAssetNextCall(Settings.particle.dict)
-        ---@diagnostic disable-next-line: param-type-mismatch
-        particle = StartParticleFxLoopedOnEntityBone(Settings.particle.fx, cache.vehicle, 0.0, -0.02, 0.0, 0.0, 0.0, 0.0, GetEntityBoneIndexByName(cache.vehicle, self:getExhaustBone()), Settings.particle.size, false, false, false)
-    end)
+    lib.requestNamedPtfxAsset(Settings.particle.dict)
+    SetPtfxAssetNextCall(Settings.particle.dict)
+    UseParticleFxAssetNextCall(Settings.particle.dict)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    particle = StartParticleFxLoopedOnEntityBone(Settings.particle.fx, cache.vehicle, 0.0, -0.02, 0.0, 0.0, 0.0, 0.0, GetEntityBoneIndexByName(cache.vehicle, self:getExhaustBone()), Settings.particle.size, false, false, false)
 
     SetVehicleBoostActive(cache.vehicle, true)
     SetVehicleEnginePowerMultiplier(cache.vehicle, Settings.multiplier.enginePower)
@@ -131,12 +129,10 @@ function Nitrous:stop(item)
 
     self.private.active = false
 
-    lib.callback('malice_nitrous:server:sync', false, function()
-        ---@diagnostic disable-next-line: param-type-mismatch
-        StopParticleFxLooped(particle, true)
-        RemoveNamedPtfxAsset(Settings.particle.dict)
-        particle = false
-    end)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    StopParticleFxLooped(particle, true)
+    RemoveNamedPtfxAsset(Settings.particle.dict)
+    particle = false
 
     SetVehicleBoostActive(cache.vehicle, false)
     SetVehicleEnginePowerMultiplier(cache.vehicle, 0.0)
