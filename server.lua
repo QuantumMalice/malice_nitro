@@ -103,7 +103,7 @@ if Settings.useRefill then
             if success then
                 local slot = Inventory:GetSlotIdWithItem(src, 'nitrous', { durability = 0 }, true)
 
-                if Inventory:CanCarryItem(src, 'nitorus', 1) then
+                if Inventory:CanCarryItem(src, 'nitrous', 1) then
                     Inventory:RemoveItem(src, 'nitrous', 1, { durability = 0 }, slot, true, true)
                     Inventory:AddItem(src, 'nitrous', 1, { durability = 100 })
                 else
