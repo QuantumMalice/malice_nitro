@@ -3,28 +3,9 @@ local Settings <const> = lib.load('data.settings')
 ---@type integer | false
 local particle = false
 
-local BONES <const> = {
-    "exhaust",
-    "exhaust_2",
-    "exhaust_3",
-    "exhaust_4",
-    "exhaust_5",
-    "exhaust_6",
-    "exhaust_7",
-    "exhaust_8",
-    "exhaust_9",
-    "exhaust_10",
-    "exhaust_11",
-    "exhaust_12",
-    "exhaust_13",
-    "exhaust_14",
-    "exhaust_15",
-    "exhaust_16",
-}
-
 ---@class privateNitrousData
 ---@field active boolean
----@field exhaust string|false
+---@field exhaust integer|false
 
 ---@class Nitrous : OxClass
 ---@field keybind CKeybind
@@ -81,8 +62,11 @@ end
 
 function Nitrous:setExhaustBone()
     if cache.vehicle then
-        for _,bone in pairs(BONES) do
-            if GetEntityBoneIndexByName(cache.vehicle, bone) ~= -1 then
+        for i = 1, 16 do
+            local name = i == 1 and "exhaust" or ("exhaust_%d"):format(i)
+            local bone = GetEntityBoneIndexByName(cache.vehicle, name)
+
+            if bone ~= -1 then
                 self.private.exhaust = bone
                 return
             end
@@ -101,7 +85,7 @@ function Nitrous:start()
     SetPtfxAssetNextCall(Settings.particle.dict)
     UseParticleFxAssetNextCall(Settings.particle.dict)
     ---@diagnostic disable-next-line: param-type-mismatch
-    particle = StartParticleFxLoopedOnEntityBone(Settings.particle.fx, cache.vehicle, 0.0, -0.02, 0.0, 0.0, 0.0, 0.0, GetEntityBoneIndexByName(cache.vehicle, self:getExhaustBone()), Settings.particle.size, false, false, false)
+    particle = StartParticleFxLoopedOnEntityBone(Settings.particle.fx, cache.vehicle, 0.0, -0.02, 0.0, 0.0, 0.0, 0.0, self.private.exhaust, Settings.particle.size, false, false, false)
 
     SetVehicleBoostActive(cache.vehicle, true)
     SetVehicleEnginePowerMultiplier(cache.vehicle, Settings.multiplier.enginePower)
