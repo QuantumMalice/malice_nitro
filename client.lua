@@ -19,12 +19,13 @@ local function addRadialItem()
             onSelect = function()
                 if not Nitrous then return end
 
-                Nitrous.keybind:disable(true)
                 lib.removeRadialItem('unload_nitrous')
+                Nitrous.keybind:disable(true)
 
                 if lib.progressCircle(Progress['uninstall']) then
                     TriggerServerEvent('malice_nitrous:server:unload', VehToNet(cache.vehicle))
                 else
+                    addRadialItem()
                     Nitrous.keybind:disable(false)
                 end
             end
@@ -43,8 +44,8 @@ lib.callback.register('malice_nitrous:client:load', function()
     if nitro and nitro > 0.0 then lib.notify(Notify['is_loaded']) return false end
 
     if lib.progressCircle(Progress['install']) then
-        Nitrous.keybind:disable(false)
         addRadialItem()
+        Nitrous.keybind:disable(false)
 
         return true, VehToNet(cache.vehicle)
     else
