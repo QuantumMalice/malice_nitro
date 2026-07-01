@@ -1,3 +1,5 @@
+# malice_nitro
+
 ![Main Banner](https://i.imgur.com/qyeKUDy.png)
 
 Lightweight NOS system built around statebags for tracking levels. Simple, clean, and designed to be easy to integrate into existing ox-based setups.
@@ -21,8 +23,9 @@ Lightweight NOS system built around statebags for tracking levels. Simple, clean
 - [ox_target](https://github.com/overextended/ox_target)
 - [ox_inventory](https://github.com/overextended/ox_inventory)
 
+### **_Access nitrous level (for HUDs)_**:
+
 ```lua
--- Access nitrous level (for HUDs)
 Entity(cache.vehicle).state.nitrous
 ```
 
