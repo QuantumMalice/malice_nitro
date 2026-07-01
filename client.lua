@@ -17,11 +17,15 @@ local function addRadialItem()
             label = 'Unload Nitrous',
             icon = 'hand-holding-droplet',
             onSelect = function()
-                --TODO: Add a progress bar for unloading nitrous
-                local success = lib.callback.await('malice_nitrous:server:unload', false,  VehToNet(cache.vehicle))
+                if not Nitrous then return end
 
-                if success then
-                    lib.removeRadialItem('unload_nitrous')
+                Nitrous.keybind:disable(true)
+                lib.removeRadialItem('unload_nitrous')
+
+                if lib.progressCircle(Progress['uninstall']) then
+                    TriggerServerEvent('malice_nitrous:server:unload', VehToNet(cache.vehicle))
+                else
+                    Nitrous.keybind:disable(false)
                 end
             end
         }
@@ -39,7 +43,6 @@ lib.callback.register('malice_nitrous:client:load', function()
     if nitro and nitro > 0.0 then lib.notify(Notify['is_loaded']) return false end
 
     if lib.progressCircle(Progress['install']) then
-        ClearPedTasks(cache.ped)
         Nitrous.keybind:disable(false)
         addRadialItem()
 

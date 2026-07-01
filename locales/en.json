@@ -3,7 +3,8 @@
     "refill": "Refill nitrous oxide"
   },
   "progress": {
-    "install": "Installing nitrous"
+    "install": "Installing nitrous",
+    "uninstall": "Uninstalling nitrous"
   },
   "notify": {
     "title": "Nitrous Oxide",

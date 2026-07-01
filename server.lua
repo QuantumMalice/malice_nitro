@@ -65,7 +65,8 @@ lib.callback.register('malice_nitrous:server:sync', function()
 end)
 
 ---@param netid integer
-lib.callback.register('malice_nitrous:server:unload', function(source, netid)
+RegisterNetEvent('malice_nitrous:server:unload', function(netid)
+    local src = source
     local vehicle = NetworkGetEntityFromNetworkId(netid)
 
     if DoesEntityExist(vehicle) then
@@ -73,13 +74,9 @@ lib.callback.register('malice_nitrous:server:unload', function(source, netid)
 
         if nitro and nitro > 0.0 then
             Entity(vehicle).state:set('nitrous', nil, true)
-            Inventory:AddItem(source, 'nitrous', 1, { durability = nitro })
-
-            return true
+            Inventory:AddItem(src, 'nitrous', 1, { durability = nitro })
         end
     end
-
-    return false
 end)
 
 if Settings.giveEmpty then
