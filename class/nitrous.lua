@@ -21,6 +21,7 @@ function Nitrous:constructor()
         defaultKey = 'LSHIFT',
         disabled = true,
         onPressed = function()
+            if self:isActive() then return end
             if not self:isVehicleValid() then return end
             if not GetIsVehicleEngineRunning(cache.vehicle) then return end
 
@@ -31,6 +32,7 @@ function Nitrous:constructor()
             end
         end,
         onReleased = function()
+            if not self:isActive() then return end
             if not self:isVehicleValid() then return end
 
             local nitro = Entity(cache.vehicle).state.nitrous
@@ -87,9 +89,7 @@ end
 function Nitrous:removeVehicle(vehicle)
     if not vehicle then return end
 
-    if self.private.active then
-        self:stop(false)
-    end
+    self:stop(false)
 
     if self.private.vehicles[vehicle] then
         self.private.vehicles[vehicle] = nil
@@ -97,8 +97,6 @@ function Nitrous:removeVehicle(vehicle)
 end
 
 function Nitrous:start()
-    if self.private.active then return end
-
     self.private.active = true
     Entity(cache.vehicle).state:set('flame', true, true)
     SetVehicleBoostActive(cache.vehicle, true)
@@ -123,8 +121,6 @@ end
 
 ---@param item boolean
 function Nitrous:stop(item)
-    if not self.private.active then return end
-
     self.private.active = false
     Entity(cache.vehicle).state:set('flame', false, true)
     SetVehicleBoostActive(cache.vehicle, false)
