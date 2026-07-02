@@ -2,6 +2,9 @@
   "target": {
     "refill": "Refill nitrous oxide"
   },
+  "radial": {
+    "unload": "Unload Nitrous"
+  },
   "progress": {
     "install": "Installing nitrous",
     "uninstall": "Uninstalling nitrous"

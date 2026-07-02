@@ -14,7 +14,7 @@ local function addRadialItem()
     lib.addRadialItem({
         {
             id = 'unload_nitrous',
-            label = 'Unload Nitrous',
+            label = locale('radial.unload'),
             icon = 'hand-holding-droplet',
             onSelect = function()
                 if not Nitrous then return end
@@ -57,26 +57,45 @@ end)
 lib.onCache('seat', function(seat)
     if not Nitrous then return end
 
-    if Nitrous:getExhaustBone() ~= nil then
-        Nitrous:setExhaustBone()
+    if seat == -1 and Nitrous:isVehicleValid() then
+        local found, added = Nitrous:addVehicle(cache.vehicle)
+        if not found and not added then return end
 
-        if seat == -1 and Nitrous:isVehicleValid() then
-            local nitro = Entity(cache.vehicle).state.nitrous
+        local nitro = Entity(cache.vehicle).state.nitrous
 
-            if nitro and nitro > 0.0 then
-                addRadialItem()
-                Nitrous.keybind:disable(false)
-            end
-        else
-            if Nitrous:isActive() then
-                Nitrous:stop(false)
-            end
-
-            if not Nitrous.keybind.disabled then
-                lib.removeRadialItem('unload_nitrous')
-                Nitrous.keybind:disable(true)
-            end
+        if nitro and nitro > 0.0 then
+            addRadialItem()
+            Nitrous.keybind:disable(false)
         end
+    end
+end)
+
+---@param current number|false
+---@param old number|false
+lib.onCache('vehicle', function(current, old)
+    if not Nitrous then return end
+    if current then return end
+
+    Nitrous:removeVehicle(old)
+
+    if not Nitrous.keybind.disabled then
+        lib.removeRadialItem('unload_nitrous')
+        Nitrous.keybind:disable(true)
+    end
+end)
+
+---@diagnostic disable-next-line: param-type-mismatch
+AddStateBagChangeHandler("flame", nil, function(bagName, key, value, reserved, replicated)
+    if not Nitrous then return end
+    if replicated or value == nil then return end
+
+    local vehicle = GetEntityFromStateBagName(bagName)
+    if not vehicle or not DoesEntityExist(vehicle) then return end
+
+    if value then
+        Nitrous:startFlame(vehicle)
+    else
+        Nitrous:stopFlame(vehicle)
     end
 end)
 
@@ -84,6 +103,9 @@ CreateThread(function()
     Nitrous = Class:new()
 
     if cache.seat == -1 and Nitrous:isVehicleValid() then
+        local found, added = Nitrous:addVehicle(cache.vehicle)
+        if not found and not added then return end
+
         local nitro = Entity(cache.vehicle).state.nitrous
 
         if nitro and nitro > 0.0 then

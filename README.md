@@ -2,7 +2,7 @@
 
 ![Main Banner](https://i.imgur.com/qyeKUDy.png)
 
-Lightweight NOS system built around statebags for tracking levels. Simple, clean, and designed to be easy to integrate into existing ox-based setups.
+Lightweight NOS system built around statebags. Simple, clean, and designed to be easy to integrate into existing ox-based setups.
 
 ## **Features:**
 
@@ -10,12 +10,11 @@ Lightweight NOS system built around statebags for tracking levels. Simple, clean
 - [x] Smooth nitrous system <br>
 - [x] Bottle removal (radial menu) <br>
 - [x] Configurable refill stations <br>
-- [x] Easy configuration and integration <br>
-- [ ] Synced particle effects <br>
-- [ ] Purge mode <br>
-- [ ] Persistence abstraction <br>
+- [x] Synced particle effects <br>
 - [ ] Configurable boost curves <br>
 - [ ] Bottle pressure simulation <br>
+- [ ] Persistence abstraction <br>
+- [ ] Purge mode <br>
 
 ## **Dependencies:**
 
