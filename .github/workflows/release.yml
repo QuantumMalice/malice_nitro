@@ -44,6 +44,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Bump manifest version
+        run: node .github/actions/bump-manifest-version.js
+        env:
+          TGT_RELEASE_VERSION: ${{ inputs.version }}
+
       - name: Push manifest change
         uses: EndBug/add-and-commit@v9
         with:
