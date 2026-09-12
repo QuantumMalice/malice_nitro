@@ -5,8 +5,8 @@ return {
     depletionRate = 0.25, -- Rate that the nitrous level will be deducted by
     depletionTick = 200, -- Speed that each deduction will occur (milliseconds)
     multiplier = {
-        enginePower = 2.0, -- Engine power multiplier applied when nitrous is being used
-        engineTorque = 2.0 -- Engine torque multiplier applied when nitrous is being used
+        enginePower = 1.5, -- Engine power multiplier applied when nitrous is being used
+        engineTorque = 1.5 -- Engine torque multiplier applied when nitrous is being used
     },
     particle = {
         dict = "veh_xs_vehicle_mods", -- Particle dictionary
