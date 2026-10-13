@@ -5,7 +5,7 @@ lua54 'yes'
 name 'malice_nitro'
 description 'Simple vehicle nitrous system using statebags'
 author 'QuantumMalice'
-version '1.3.0'
+version '1.3.1'
 
 dependencies {
 	'ox_lib',
