@@ -49,12 +49,16 @@ local function stopNitrous(vehicle)
     state:set('flame', false, true)
 
     local nitro = Entity(vehicle).state.nitrous
-    if nitro and nitro <= 0.0 and Settings.giveEmpty then
-        if Inventory:CanCarryItem(data.source, 'nitrous', 1) then
-            Inventory:AddItem(data.source, 'nitrous', 1, { durability = 0 })
-        else
-            lib.notify(data.source, Notify['no_space'])
+    if nitro and nitro <= 0.0 then
+        if Settings.giveEmpty then
+            if Inventory:CanCarryItem(data.source, 'nitrous', 1) then
+                Inventory:AddItem(data.source, 'nitrous', 1, { durability = 0 })
+            else
+                lib.notify(data.source, Notify['no_space'])
+            end
         end
+
+        state:set('nitrous', nil, true)
     end
 
     TriggerClientEvent('malice_nitro:client:stop', data.source)

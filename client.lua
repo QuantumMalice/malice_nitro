@@ -8,29 +8,26 @@ local Settings <const> = lib.load('data.settings')
 
 ---@param seat number
 lib.onCache('seat', function(seat)
-    if seat ~= -1 then return end
+    if seat ~= -1 then
+        Nitrous:setLoaded(false)
+        return
+    end
+
     if not Nitrous:isVehicleValid() then return end
 
     Nitrous:setExhaustBones(cache.vehicle, true)
 
     local nitro = Entity(cache.vehicle).state.nitrous
 
-    if nitro and nitro > 0.0 then
-        Nitrous:addRadialItem()
-        Nitrous.keybind:disable(false)
-    end
+    Nitrous:setLoaded(nitro and nitro > 0.0 or false)
 end)
 
 ---@param current number|false
 ---@param old number|false
 lib.onCache('vehicle', function(current, old)
     if current or not old then return end
-    if not Nitrous:isVehicleValid() then return end
 
-    if not Nitrous.keybind.disabled then
-        lib.removeRadialItem('unload_nitrous')
-        Nitrous.keybind:disable(true)
-    end
+    Nitrous:setLoaded(false)
 end)
 
 lib.callback.register('malice_nitrous:client:load', function()
@@ -43,6 +40,15 @@ RegisterNetEvent('malice_nitro:client:stop', function()
     if not Nitrous:isActive() then return end
 
     Nitrous:stop(false)
+end)
+
+---@diagnostic disable-next-line: param-type-mismatch
+AddStateBagChangeHandler('nitrous', nil, function(bagName, _, value)
+    if cache.seat ~= -1 or not cache.vehicle then return end
+    if GetEntityFromStateBagName(bagName) ~= cache.vehicle then return end
+    if not Nitrous:isVehicleValid() then return end
+
+    Nitrous:setLoaded(value and value > 0.0 or false)
 end)
 
 ---@diagnostic disable-next-line: param-type-mismatch

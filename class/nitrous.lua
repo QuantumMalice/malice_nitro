@@ -5,6 +5,7 @@ local Inventory <const> = exports.ox_inventory
 
 ---@class privateNitrousData
 ---@field active boolean
+---@field loaded boolean
 ---@field vehicles table<number, { bones: number[], particles: number[] }>
 
 ---@class Nitrous : OxClass
@@ -15,6 +16,7 @@ local Nitrous = lib.class('malice_nitro')
 
 function Nitrous:constructor()
     self.private.active = false
+    self.private.loaded = false
     self.private.vehicles = {}
 
     self.keybind = lib.addKeybind({
@@ -29,7 +31,7 @@ function Nitrous:constructor()
             if not GetIsVehicleEngineRunning(cache.vehicle) then return end
 
             local nitro = Entity(cache.vehicle).state.nitrous
-            if nitro or nitro > 0.0 then
+            if nitro and nitro > 0.0 then
                 self:start()
             end
         end,
@@ -46,8 +48,7 @@ function Nitrous:constructor()
         local nitro = Entity(cache.vehicle).state.nitrous
 
         if nitro and nitro > 0.0 then
-            self:addRadialItem()
-            self.keybind:disable(false)
+            self:setLoaded(true)
         end
     end
 end
@@ -73,18 +74,35 @@ function Nitrous:addRadialItem()
             label = locale('radial.unload'),
             icon = 'hand-holding-droplet',
             onSelect = function()
-                lib.removeRadialItem('unload_nitrous')
+                if self:isActive() then return end
+
                 self.keybind:disable(true)
 
                 if lib.progressCircle(Progress['uninstall']) then
                     TriggerServerEvent('malice_nitrous:server:unload')
-                else
-                    self:addRadialItem()
-                    self.keybind:disable(false)
                 end
+
+                -- The nitrous statebag handler removes the radial item once the server has unloaded it
+                self.keybind:disable(not self.private.loaded)
             end
         }
     })
+end
+
+---Shows or hides the unload radial item and the nitrous keybind
+---@param loaded boolean
+function Nitrous:setLoaded(loaded)
+    if self.private.loaded == loaded then return end
+
+    self.private.loaded = loaded
+
+    if loaded then
+        self:addRadialItem()
+    else
+        lib.removeRadialItem('unload_nitrous')
+    end
+
+    self.keybind:disable(not loaded)
 end
 
 ---@param vehicle number | false
@@ -117,14 +135,7 @@ function Nitrous:load()
     local nitro = Entity(cache.vehicle).state.nitrous
     if nitro and nitro > 0.0 then lib.notify(Notify['is_loaded']) return false end
 
-    if lib.progressCircle(Progress['install']) then
-        self:addRadialItem()
-        self.keybind:disable(false)
-
-        return true
-    else
-        return false
-    end
+    return lib.progressCircle(Progress['install']) == true
 end
 
 function Nitrous:start()
@@ -134,6 +145,11 @@ function Nitrous:start()
     if not success then return end
 
     self.private.active = true
+
+    -- The key was released while waiting for the server
+    if not self.keybind:isControlPressed() then
+        return self:stop(true)
+    end
 
     CreateThread(function()
         SetVehicleBoostActive(cache.vehicle, true)
@@ -160,13 +176,6 @@ function Nitrous:stop(notifyServer)
 
     if notifyServer then
         lib.callback.await('malice_nitro:server:stop')
-    end
-
-    if cache.vehicle then
-        local nitro = Entity(cache.vehicle).state.nitrous
-        if nitro and nitro <= 0.0 then
-            self.keybind:disable(true)
-        end
     end
 end
 
