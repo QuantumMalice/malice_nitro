@@ -1,7 +1,7 @@
 lib.locale()
 
 ---@class Nitrous : OxClass
-local Nitrous = require 'class.nitrous'
+local Nitrous = require('class.nitrous'):new()
 local Target <const> = exports.ox_target
 local Inventory <const> = exports.ox_inventory
 local Settings <const> = lib.load('data.settings')
@@ -66,8 +66,6 @@ AddStateBagChangeHandler('flame', nil, function(bagName, _, value)
 end)
 
 CreateThread(function()
-    Nitrous = Nitrous:new()
-
     if Settings.useRefill then
         for index, ped in pairs(Settings.peds) do
             lib.zones.sphere({
